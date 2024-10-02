@@ -1,0 +1,39 @@
+//@version=5
+indicator("Positive Volatility and Volume Gauge with True Momentum Oscillator", overlay=false)
+
+// Input parameters
+atr_length = input(14, "ATR Length")
+signal_threshold = input(1.5, "Signal Threshold")
+mom_length = input(14, title="Momentum Length")
+mom_oversold = input(-1, title="Oversold Level")
+mom_overbought = input(1, title="Overbought Level")
+ 
+// Calculate real volatility
+realVolatility = ta.tr(true)
+
+// Filter out negative values of real volatility
+positiveVolatility = realVolatility >= 0 ? realVolatility : na
+
+// Calculate signal lines
+upperSignal = ta.sma(positiveVolatility, atr_length) * signal_threshold
+
+// Calculate volume gauge
+volumeGauge = volume / 25000 // Divide by a factor for better visualization
+
+// Calculate true momentum oscillator
+mom = ta.mom(close, mom_length)
+
+// Plot positive real volatility as a line
+plot(positiveVolatility, color=color.blue, title="Positive Volatility")
+
+// Plot upper signal line
+plot(upperSignal, color=color.orange, title="Upper Signal Line")
+
+// Plot volume gauge as a histogram at the bottom of the indicator
+plot(volumeGauge, style=plot.style_columns, color=color.yellow, title="Volume Gauge")
+
+// Plot true momentum oscillator
+plot(mom, color=color.green, title="True Momentum Oscillator")
+hline(mom_oversold, "Oversold", color=color.red)
+hline(mom_overbought, "Overbought", color=color.green)
+
